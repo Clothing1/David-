@@ -3,24 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David's Crack Heads</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Game Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        #landing { padding: 20px; background-color: #f4f4f4; text-align: center; }
+        #rules { padding: 20px; background-color: white; }
+        #gameContainer { text-align: center; }
+    </style>
 </head>
 <body>
     <div id="landing">
-        <h1>David's Crack Heads</h1>
-        <button id="startButton">🧠</button>
-        <audio id="music" loop>
-            <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
-            Your browser does not support the audio element.
-        </audio>
+        <h1>Welcome to the Game!</h1>
+        <p>Get ready to have some fun!</p>
     </div>
-    <div id="rules" style="display: none;">
-        <h2>Rules</h2>
-        <p>You are a job application. Hunt down the crack heads collecting coins. Avoid getting too close or you'll lose!</p>
-        <p>Use arrow keys to move. Collect coins to score points.</p>
+    <div id="rules">
+        <h2>Game Rules</h2>
+        <ol>
+            <li>Rule 1: Always play fair.</li>
+            <li>Rule 2: Respect other players.</li>
+            <li>Rule 3: Have fun!</li>
+        </ol>
     </div>
-    <canvas id="gameCanvas" style="display: none;"></canvas>
-    <script src="game.js"></script>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="stats">
+            <h3>Game Stats</h3>
+            <p>Score: <span id="score">0</span></p>
+            <p>Level: <span id="level">1</span></p>
+        </div>
+    </div>
 </body>
 </html>
