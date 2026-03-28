@@ -3,128 +3,137 @@ const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 600;
 
-let player = { x: 400, y: 300, width: 50, height: 50, speed: 5 };
+let player = { x: 400, y: 300, width: 50, height: 50, speed: 6 };
 let crackHeads = [];
 let coins = [];
 let score = 0;
-let gameActive = true;
+let gameActive = false;
+let gameStarted = false;
 
 function initGame() {
-    player = { x: 400, y: 300, width: 50, height: 50, speed: 5 };
+    player = { x: 400, y: 300, width: 50, height: 50, speed: 6 };
     crackHeads = [];
     coins = [];
     score = 0;
     gameActive = true;
+    gameStarted = true;
     
-    // Create crack heads
     for (let i = 0; i < 5; i++) {
         crackHeads.push({
-            x: Math.random() * (canvas.width - 40) + 20,
-            y: Math.random() * (canvas.height - 40) + 20,
+            x: Math.random() * (canvas.width - 80) + 40,
+            y: Math.random() * (canvas.height - 80) + 40,
             radius: 20,
-            dx: (Math.random() - 0.5) * 4,
-            dy: (Math.random() - 0.5) * 4
+            dx: (Math.random() - 0.5) * 3,
+            dy: (Math.random() - 0.5) * 3
         });
     }
     
-    // Create coins
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 15; i++) {
         coins.push({
             x: Math.random() * (canvas.width - 10),
             y: Math.random() * (canvas.height - 10),
-            width: 10,
-            height: 10
+            radius: 5
         });
     }
 }
 
+const keys = {};
+
+window.addEventListener('keydown', (e) => {
+    keys[e.key] = true;
+});
+
+window.addEventListener('keyup', (e) => {
+    keys[e.key] = false;
+});
+
 function update() {
     if (!gameActive) return;
     
-    // Move crack heads
+    if (keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
+    if (keys['ArrowRight'] || keys['d']) player.x += player.speed;
+    if (keys['ArrowUp'] || keys['w']) player.y -= player.speed;
+    if (keys['ArrowDown'] || keys['s']) player.y += player.speed;
+    
+    if (player.x < 0) player.x = 0;
+    if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+    if (player.y < 0) player.y = 0;
+    if (player.y + player.height > canvas.height) player.y = canvas.height - player.height;
+    
     crackHeads.forEach(ch => {
         ch.x += ch.dx;
         ch.y += ch.dy;
+        
         if (ch.x - ch.radius < 0 || ch.x + ch.radius > canvas.width) ch.dx *= -1;
         if (ch.y - ch.radius < 0 || ch.y + ch.radius > canvas.height) ch.dy *= -1;
     });
-
-    // Move player
-    if (keys['ArrowLeft']) player.x -= player.speed;
-    if (keys['ArrowRight']) player.x += player.speed;
-    if (keys['ArrowUp']) player.y -= player.speed;
-    if (keys['ArrowDown']) player.y += player.speed;
-
-    // Keep player in bounds
-    if (player.x < 0) player.x = 0;
-    if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
-    if (player.y < 0) player.y = 0;
-    if (player.y > canvas.height - player.height) player.y = canvas.height - player.height;
-
-    // Check collision with crack heads
+    
     for (let i = crackHeads.length - 1; i >= 0; i--) {
         const ch = crackHeads[i];
-        const distX = (player.x + player.width / 2) - ch.x;
-        const distY = (player.y + player.height / 2) - ch.y;
-        const distance = Math.sqrt(distX * distX + distY * distY);
+        const playerCenterX = player.x + player.width / 2;
+        const playerCenterY = player.y + player.height / 2;
         
-        if (distance < (player.width / 2 + ch.radius)) {
+        const dist = Math.sqrt((playerCenterX - ch.x) ** 2 + (playerCenterY - ch.y) ** 2);
+        
+        if (dist < player.width / 2 + ch.radius + 10) {
             crackHeads.splice(i, 1);
             score += 10;
+            document.getElementById('score').textContent = score;
+            document.getElementById('enemies').textContent = crackHeads.length;
+            
+            if (crackHeads.length === 0) {
+                gameActive = false;
+                alert('You Won! Final Score: ' + score);
+            }
         }
     }
 }
 
 function draw() {
-    // Clear canvas
-    ctx.fillStyle = '#222';
+    ctx.fillStyle = '#1a1a2e';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = '#666';
+    
+    ctx.strokeStyle = '#00ff00';
+    ctx.lineWidth = 2;
     ctx.strokeRect(0, 0, canvas.width, canvas.height);
     
-    // Draw player (blue square - job application)
     ctx.fillStyle = '#4A90E2';
     ctx.fillRect(player.x, player.y, player.width, player.height);
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 20px Arial';
+    
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 30px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('📋', player.x + player.width / 2, player.y + player.height / 2);
     
-    // Draw crack heads (red circles)
     crackHeads.forEach(ch => {
         ctx.fillStyle = '#FF4444';
         ctx.beginPath();
         ctx.arc(ch.x, ch.y, ch.radius, 0, Math.PI * 2);
         ctx.fill();
+        
         ctx.strokeStyle = '#FF0000';
         ctx.lineWidth = 2;
         ctx.stroke();
+        
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('😈', ch.x, ch.y);
     });
     
-    // Draw coins (yellow circles)
     coins.forEach(coin => {
         ctx.fillStyle = '#FFD700';
         ctx.beginPath();
-        ctx.arc(coin.x, coin.y, 5, 0, Math.PI * 2);
+        ctx.arc(coin.x, coin.y, coin.radius, 0, Math.PI * 2);
         ctx.fill();
+        
+        ctx.strokeStyle = '#FFA500';
+        ctx.lineWidth = 1;
+        ctx.stroke();
     });
-    
-    // Draw score
-    ctx.fillStyle = '#FFF';
-    ctx.font = 'bold 24px Arial';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText('Score: ' + score, 10, 10);
-    
-    // Draw remaining enemies
-    ctx.font = '16px Arial';
-    ctx.fillText('Enemies: ' + crackHeads.length, 10, 40);
 }
-
-let keys = {};
-document.addEventListener('keydown', e => keys[e.key] = true);
-document.addEventListener('keyup', e => keys[e.key] = false);
 
 function gameLoop() {
     update();
@@ -136,10 +145,26 @@ document.getElementById('startButton').addEventListener('click', () => {
     document.getElementById('landing').style.display = 'none';
     document.getElementById('rules').style.display = 'block';
     
-    setTimeout(() => {
-        document.getElementById('rules').style.display = 'none';
-        document.getElementById('gameContainer').style.display = 'block';
-        initGame();
-        gameLoop();
-    }, 5000);
+    let countdown = 5;
+    const countdownEl = document.getElementById('countdown');
+    
+    const timer = setInterval(() => {
+        countdown--;
+        countdownEl.textContent = `Starting in ${countdown}...`;
+        
+        if (countdown <= 0) {
+            clearInterval(timer);
+            document.getElementById('rules').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'flex';
+            
+            if (!gameStarted) {
+                initGame();
+                gameLoop();
+            } else {
+                gameActive = true;
+            }
+        }
+    }, 1000);
 });
+
+gameLoop();
