@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>David's Crack Heads</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="landing">
+        <h1>David's Crack Heads</h1>
+        <button id="startButton">🧠</button>
+        <audio id="music" loop>
+            <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+    <div id="rules" style="display: none;">
+        <h2>Rules</h2>
+        <p>You are a job application. Hunt down the crack heads collecting coins. Avoid getting too close or you'll lose!</p>
+        <p>Use arrow keys to move. Collect coins to score points.</p>
+    </div>
+    <canvas id="gameCanvas" style="display: none;"></canvas>
+    <script src="game.js"></script>
+</body>
+</html>
